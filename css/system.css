@@ -226,7 +226,7 @@ h2 {
 .modeless-dialog {
 	height: 100%;
 	padding: 1.5rem 0.5rem 0.5rem 0.5rem;
-	font-size: 18px;
+	font-size: 20px;
 	letter-spacing: -0.025em;
 }
 
@@ -372,13 +372,13 @@ h2 {
 	overflow: hidden;
 	background-color: var(--primary);
 	border: 0.1em solid var(--secondary);
-	font-family: "Inconsolata", Menlo, Chicago, Geneva;
+	font-family: Monaco, Chicago, Geneva_9;
 }
 .window-pane {
 	overflow-y: scroll;
 	height: 100%;
 	padding: 1rem 2rem;
-	font-size: 18px;
+	font-size: 20px;
 	letter-spacing: -0.025em;
 	/*margin-bottom: 1rem;*/
 }
@@ -457,7 +457,7 @@ h2 {
 	color: var(--secondary);
 	text-align: center;
 	text-decoration: none;
-	font-size: 18px;
+	font-size: 20px;
 	font-family: Chicago_12;
 	cursor: pointer;
 }
@@ -480,7 +480,7 @@ h2 {
 	color: var(--disabled);
 	text-align: center;
 	text-decoration: none;
-	font-size: 18px;
+	font-size: 20px;
 	font-family: Chicago_12;
 }
 
@@ -497,7 +497,7 @@ h2 {
 input {
 	border: 1.5px solid var(--secondary);
 	font-family: Chicago_12;
-	font-size: 18px;
+	font-size: 20px;
 	padding-left: 5px;
 }
 
@@ -659,8 +659,8 @@ input[type="checkbox"][disabled]:checked + label::after {
 
 /* Form */
 form {
-	font-family: "Inconsolata", Menlo, Chicago, Geneva;
-	font-size: 14px;
+	font-family: Monaco, Chicago, Geneva_9;
+	font-size: 16px;
 }
 
 /* select menu */
@@ -669,7 +669,7 @@ select {
 	height: auto;
 	width: 10rem;
 	font-family: Chicago_12;
-	font-size: 18px;
+	font-size: 20px;
 	background-image: svg-load("./icon/select-button.svg");
 	background-position: top 2px right 2px;
 	background-repeat: no-repeat;

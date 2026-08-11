@@ -10,13 +10,14 @@
     <link rel="stylesheet" href="css/style.css">
     <script src="js/lib/vivus.js"></script>
     <script src="js/lib/isomer.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <script src="js/lib/localforage.js"></script>
+    <script type="module" src="js/index.js"></script>
   </head>
   <body>
     <div id="game-ui">
       <header class="title-bar">
         <button type="button" class="close hidden"><span>Close</span></button>
-        <span class="title" style="color:white">AbyssalCards</span>
+        <span class="title" style="color:white">AbyssalCards.exe</span>
         <button type="button" class="resize hidden"><span>Resize</span></button>
       </header>
 
@@ -47,21 +48,21 @@
           <div class="window-pane">
             <span class="btn-group-label">Cards</span>
             <div class="btn-group">
-              <button type="button" class="btn" onclick="addCard('ace', null)">Draw Ace</button>
-              <button type="button" class="btn" onclick="hand.innerHTML = '';">Clear</button>
+              <button type="button" class="btn" id="buy-card" onclick="buyCard()">Draw Card (5 mana)</button>
+              <button type="button" class="btn" onclick="removeSelectedCard()">Banish Card</button>
             </div>
 
-            <span class="btn-group-label">Modify Rank</span>
+            <span class="btn-group-label">Modify Rank <span class="modify-cost">Cost: 5 control</span></span>
             <div class="btn-group">
-              <button type="button" class="btn" onclick="shiftRank(-1)">-</button>
-              <button type="button" class="btn" onclick="shiftRank(1)">+</button>
+              <button type="button" class="btn modify-btn" onclick="shiftRank(-1)">-</button>
+              <button type="button" class="btn modify-btn" onclick="shiftRank(1)">+</button>
             </div>
-            <span class="btn-group-label">Modify Suite</span>
+            <span class="btn-group-label">Modify Suite <span class="modify-cost">Cost: 5 control</span></span>
             <div class="btn-group">
-              <button type="button" class="btn" onclick="modifySelectedCard({suite:'hearts'})">♥</button>
-              <button type="button" class="btn" onclick="modifySelectedCard({suite:'spades'})">♠</button>
-              <button type="button" class="btn" onclick="modifySelectedCard({suite:'diamonds'})">♦</button>
-              <button type="button" class="btn" onclick="modifySelectedCard({suite:'clubs'})">♣</button>
+              <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'hearts'})">♥</button>
+              <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'spades'})">♠</button>
+              <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'diamonds'})">♦</button>
+              <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'clubs'})">♣</button>
             </div>
           </div>
         </aside>
@@ -71,11 +72,28 @@
         <aside class="window" id="right-panel">
           <header class="title-bar">
             <button type="button" class="close hidden"><span>Close</span></button>
-            <span class="title">Data</span>
+            <span class="title">Research</span>
             <button type="button" class="minimize" aria-label="Minimize"><span>Minimize</span></button>
           </header>
-          <div class="window-pane">
-            <p>No data</p>
+          <div class="window-pane" id="data-pane">
+            <section class="pane-section">
+              <span class="btn-group-label">Gains</span>
+              <dl class="stat-list">
+                <div class="stat"><dt>Mana</dt><dd id="mana-rate">0.00/s</dd></div>
+                <div class="stat"><dt>Energy</dt><dd id="energy-rate">0.00/s</dd></div>
+                <div class="stat"><dt>Control</dt><dd id="control-rate">0.00/s</dd></div>
+                <div class="stat"><dt>Cards</dt><dd id="card-stats">0</dd></div>
+              </dl>
+            </section>
+            <section class="pane-section" id="upgrades"></section>
+            <section class="pane-section" id="achievements"></section>
+            <section class="pane-section">
+              <span class="btn-group-label">Save</span>
+              <div class="btn-group">
+                <button type="button" class="btn" onclick="saveGame()">Save</button>
+                <button type="button" class="btn" onclick="resetGame()">Reset</button>
+              </div>
+            </section>
           </div>
         </aside>
       </div>
