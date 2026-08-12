@@ -1,6 +1,6 @@
 import Data, {
 	checkAchievements,
-	getHandInfo,
+	getBoardInfo,
 	manaPerSec,
 	state,
 	transmutePerSec,
@@ -15,28 +15,11 @@ import {
 	getActiveCard,
 	hand,
 	layoutHand,
+	renderBoard,
 	updateUI,
 } from "./ui.js";
 
 window.Data = Data;
-
-// ---------- world ----------
-
-var iso = new Isomer(document.getElementById("world"));
-var Shape = Isomer.Shape;
-var Point = Isomer.Point;
-var Color = Isomer.Color;
-
-function initWorld() {
-	iso.add(
-		Shape.Prism(Point(Point.ORIGIN.x, Point.ORIGIN.y, -2), 5, 5, -5),
-		new Color(193, 180, 137),
-	);
-	iso.add(
-		Shape.Prism(Point(Point.ORIGIN.x, Point.ORIGIN.y, -2), 5, 5, 10),
-		new Color(50, 60, 160, 0.5),
-	);
-}
 
 // ---------- game loop ----------
 
@@ -46,7 +29,7 @@ function gameTick(dt) {
 	state.mana += manaPerSec() * (dt / 1000);
 	state.stats.totalMana += manaPerSec() * (dt / 1000);
 
-	const { hearts, diamonds, spades, clubs } = getHandInfo();
+	const { hearts, diamonds, spades, clubs } = getBoardInfo();
 	const rate = transmutePerSec();
 
 	function transmute(resource, count) {
@@ -80,12 +63,12 @@ setInterval(() => {
 
 window.onload = async () => {
 	new Sparticles(document.getRootNode().body, Data.sparticle.abyss);
-	initWorld();
 	await load();
 	buildUpgradeUI();
 	buildAchievementUI();
 
 	for (const c of state.cards) addCard(c.rank, c.suite, hand, false);
+	renderBoard();
 	applyOfflineProgress();
 
 	document.addEventListener("click", (e) => {
@@ -100,5 +83,8 @@ window.onload = async () => {
 
 	startAutosave();
 	updateUI();
-	window.addEventListener("resize", layoutHand);
+	window.addEventListener("resize", () => {
+		layoutHand();
+		renderBoard();
+	});
 };

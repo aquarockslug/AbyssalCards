@@ -52,7 +52,7 @@ class Card extends HTMLElement {
 		const deltaX = window.innerWidth / 2 - left - width / 2;
 		const deltaY = window.innerHeight / 2 - top - height / 2;
 
-		this.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(2)`;
+		this.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.5)`;
 		this.dispatchEvent(new CustomEvent("card-select", { bubbles: true }));
 	}
 

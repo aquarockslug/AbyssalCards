@@ -96,19 +96,19 @@ const Data = {
 	],
 	sparticle: {
 		abyss: {
-			count: 799,
-			speed: 13,
-			parallax: 17.4,
+			count: 600,
+			speed: 5,
+			parallax: 17.5,
 			direction: 0,
-			xVariance: 2.6,
+			xVariance: 2.5,
 			yVariance: 7.8,
-			alphaSpeed: 21,
+			alphaSpeed: 12,
 			alphaVariance: 0,
-			minAlpha: -2,
-			maxAlpha: 2,
-			maxSize: 4,
+			minAlpha: 0.05,
+			maxAlpha: 0.6,
+			maxSize: 3,
 			style: "both",
-			drift: 5.9,
+			drift: 6,
 			spawnArea: 1,
 			color: ["#ffffff", "#68e8f6", "#3bd4f5", "#017a98", "#017a98", "#017a98"],
 		},
@@ -163,6 +163,7 @@ export function defaultState() {
 		energy: 0,
 		control: 0,
 		cards: [],
+		board: [],
 		upgrades: { manaFlow: 0, transmute: 0, handGrowth: 0 },
 		stats: {
 			totalCardsDrawn: 0,
@@ -207,6 +208,15 @@ export function getHandInfo() {
 		diamonds: state.cards.filter((c) => c.suite === "diamonds").length,
 		spades: state.cards.filter((c) => c.suite === "spades").length,
 		clubs: state.cards.filter((c) => c.suite === "clubs").length,
+	};
+}
+
+export function getBoardInfo() {
+	return {
+		hearts: state.board.filter((c) => c && c.suite === "hearts").length,
+		diamonds: state.board.filter((c) => c && c.suite === "diamonds").length,
+		spades: state.board.filter((c) => c && c.suite === "spades").length,
+		clubs: state.board.filter((c) => c && c.suite === "clubs").length,
 	};
 }
 
