@@ -1,11 +1,8 @@
 import Data, {
 	buyUpgrade,
 	cardCost,
-	getHandInfo,
-	manaPerSec,
 	modifyCost,
 	state,
-	transmutePerSec,
 	upgradeCost,
 } from "./game.js";
 
@@ -68,23 +65,17 @@ export function updateUI() {
 	energyEl.textContent = fmt(state.energy);
 	controlEl.textContent = fmt(state.control);
 
-	const { hearts, diamonds, spades, clubs } = getHandInfo();
-	const red = hearts + diamonds;
-	const black = spades + clubs;
-
-	const ep = Math.min(state.mana, transmutePerSec() * red);
-	const cp = Math.min(state.mana, transmutePerSec() * black);
-
-	document.getElementById("mana-rate").textContent = `${fmt(manaPerSec())}/s`;
-	document.getElementById("energy-rate").textContent = `${fmt(ep)}/s`;
-	document.getElementById("control-rate").textContent = `${fmt(cp)}/s`;
-	document.getElementById("card-stats").textContent =
-		`${state.cards.length} hand (${red} red, ${black} black)`;
-
 	const cost = cardCost();
 	const buyBtn = document.getElementById("buy-card");
-	buyBtn.textContent = `Draw Card (${fmt(cost)} mana)`;
+	buyBtn.textContent = `Draw Ace (${fmt(cost)} mana)`;
 	buyBtn.disabled = state.mana < cost;
+
+	// hide card modification spells when no card is selected
+	const activeCard = getActiveCard();
+	document.querySelectorAll(".modify-cost, .modify-btn").forEach((el) => {
+		el.disabled = !activeCard;
+		el.hidden = !activeCard;
+	});
 
 	const mCost = modifyCost();
 	document.querySelectorAll(".modify-cost").forEach((el) => {
@@ -124,6 +115,7 @@ export function buildUpgradeUI() {
 		btn.setAttribute("role", "tooltip");
 		btn.setAttribute("aria-label", def.description);
 		btn.setAttribute("data-microtip-position", "bottom");
+		btn.setAttribute("data-microtip-size", "large");
 		btn.innerHTML =
 			`<span class="upgrade-name">${def.name}</span>` +
 			`<span class="upgrade-level">Lv 0</span>` +
@@ -131,13 +123,6 @@ export function buildUpgradeUI() {
 		btn.addEventListener("click", () => {
 			if (buyUpgrade(id)) updateUI();
 		});
-		btn.addEventListener("mouseenter", () => showUpgradeTip(btn));
-		btn.addEventListener("mouseleave", hideUpgradeTip);
-		btn.addEventListener("focus", () => showUpgradeTip(btn));
-		btn.addEventListener("blur", hideUpgradeTip);
-		container
-			.closest(".window-pane")
-			?.addEventListener("scroll", hideUpgradeTip);
 		container.appendChild(btn);
 	}
 }
@@ -166,38 +151,6 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 export const getActiveCard = () => document.querySelector("game-card[active]");
 
-// Upgrade tooltips would be clipped inside the scrollable panel, so render them
-// as a fixed, body-level tooltip that always sits on top.
-let upgradeTip = null;
-
-function ensureUpgradeTip() {
-	if (upgradeTip) return;
-	upgradeTip = document.createElement("div");
-	upgradeTip.className = "game-tooltip";
-	document.body.appendChild(upgradeTip);
-}
-
-function showUpgradeTip(btn) {
-	const text = btn.getAttribute("aria-label");
-	if (!text) return;
-	ensureUpgradeTip();
-	upgradeTip.textContent = text;
-	upgradeTip.style.display = "block";
-	const r = btn.getBoundingClientRect();
-	const tr = upgradeTip.getBoundingClientRect();
-	const left = Math.min(
-		Math.max(r.left + r.width / 2 - tr.width / 2, 8),
-		window.innerWidth - tr.width - 8,
-	);
-	upgradeTip.style.left = `${Math.round(left)}px`;
-	upgradeTip.style.top = `${Math.round(r.top - tr.height - 10)}px`;
-}
-
-function hideUpgradeTip() {
-	if (!upgradeTip) return;
-	upgradeTip.style.display = "none";
-}
-
 function spendForModification() {
 	const cost = modifyCost();
 	if (state.control < cost) return false;
@@ -223,10 +176,10 @@ export function addCard(rank, suite, location, track = true) {
 	return card;
 }
 
-export function buyCard() {
+export function buyCard(rank, suite) {
 	if (state.mana < cardCost()) return;
 	state.mana -= cardCost();
-	addCard(null, null, hand);
+	addCard(rank, suite, hand);
 	updateUI();
 }
 
@@ -268,7 +221,6 @@ export function shiftRank(delta) {
 	updateUI();
 }
 
-window.addCard = (rank, suite) => addCard(rank, suite, hand);
 window.addRandomCard = () => addCard(null, null, hand);
 window.modifySelectedCard = modifySelectedCard;
 window.shiftRank = shiftRank;

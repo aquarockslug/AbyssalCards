@@ -38,20 +38,6 @@ const Data = {
 	},
 	achievements: [
 		{
-			id: "collector",
-			name: "Card Collector",
-			description: "Draw 10 cards",
-			bonus: 0.25,
-			check: (s) => s.stats.totalCardsDrawn >= 10,
-		},
-		{
-			id: "deck",
-			name: "Deck Builder",
-			description: "Draw 25 cards",
-			bonus: 0.5,
-			check: (s) => s.stats.totalCardsDrawn >= 25,
-		},
-		{
 			id: "energized",
 			name: "Energized",
 			description: "Gain 100 total energy",
@@ -156,6 +142,7 @@ const Data = {
 };
 
 export default Data;
+window.data = Data;
 
 export function defaultState() {
 	return {
@@ -178,6 +165,7 @@ export function defaultState() {
 }
 
 export const state = defaultState();
+window.state = state;
 
 const achievementBonus = () => {
 	let bonus = 1;
@@ -192,7 +180,7 @@ export const manaPerSec = () =>
 export const transmutePerSec = () => 0.1 * (1 + 0.5 * state.upgrades.transmute);
 
 export const cardCost = () =>
-	7 * 1.35 ** state.cards.length * 0.9 ** state.upgrades.handGrowth;
+	5 * 3 ** state.cards.length * 0.9 ** state.upgrades.handGrowth;
 
 export const upgradeCost = (id) => {
 	const def = Data.upgrades[id];
@@ -203,11 +191,25 @@ export const modifyCost = () => 5 * 1.5 ** state.stats.totalModifications;
 
 export function getHandInfo() {
 	return {
-		hearts: state.cards.filter((c) => c.suite === "hearts").length,
-		diamonds: state.cards.filter((c) => c.suite === "diamonds").length,
-		spades: state.cards.filter((c) => c.suite === "spades").length,
-		clubs: state.cards.filter((c) => c.suite === "clubs").length,
+		suite: {
+			hearts: state.cards.filter((c) => c.suite === "hearts"),
+			diamonds: state.cards.filter((c) => c.suite === "diamonds"),
+			spades: state.cards.filter((c) => c.suite === "spades"),
+			clubs: state.cards.filter((c) => c.suite === "clubs"),
+		},
 	};
+}
+
+const cardValue = (c) => (c.rank === "ace" ? 1 : Number(c.rank));
+
+export function redValue() {
+	const { hearts, diamonds } = getHandInfo().suite;
+	return [...hearts, ...diamonds].reduce((acc, c) => acc + cardValue(c), 0);
+}
+
+export function blackValue() {
+	const { spades, clubs } = getHandInfo().suite;
+	return [...spades, ...clubs].reduce((acc, c) => acc + cardValue(c), 0);
 }
 
 export function checkAchievements() {

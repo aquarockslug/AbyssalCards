@@ -1,7 +1,9 @@
 import Data, {
+	blackValue,
 	checkAchievements,
 	getHandInfo,
 	manaPerSec,
+	redValue,
 	state,
 	transmutePerSec,
 } from "./game.js";
@@ -19,6 +21,7 @@ import {
 } from "./ui.js";
 
 window.Data = Data;
+window.hand = getHandInfo;
 
 // ---------- game loop ----------
 
@@ -28,7 +31,8 @@ function gameTick(dt) {
 	state.mana += manaPerSec() * (dt / 1000);
 	state.stats.totalMana += manaPerSec() * (dt / 1000);
 
-	const { hearts, diamonds, spades, clubs } = getHandInfo();
+	const red = redValue();
+	const black = blackValue();
 	const rate = transmutePerSec();
 
 	function transmute(resource, count) {
@@ -41,10 +45,10 @@ function gameTick(dt) {
 	}
 
 	// red cards transmute energy from mana
-	transmute("energy", hearts + diamonds);
+	if (red > 0) transmute("energy", red);
 
 	// black cards transmute control from mana
-	transmute("control", spades + clubs);
+	if (black > 0) transmute("control", black);
 
 	checkAchievements();
 	updateUI();

@@ -16,7 +16,7 @@
     <div id="game-ui">
       <header class="title-bar">
         <button type="button" class="close hidden"><span>Close</span></button>
-        <span class="title" style="color:white">AbyssalCards.exe</span>
+        <span class="title" style="color:white">Abyssal Cards</span>
         <button type="button" class="resize hidden"><span>Resize</span></button>
       </header>
 
@@ -47,16 +47,16 @@
           <div class="window-pane">
             <span class="btn-group-label">Cards</span>
             <div class="btn-group">
-              <button type="button" class="btn" id="buy-card" onclick="buyCard()">Draw Card (5 mana)</button>
-              <button type="button" class="btn" onclick="removeSelectedCard()">Banish Card</button>
+              <button type="button" class="btn" id="buy-card" onclick="buyCard('ace')"></button>
+              <button type="button" class="btn modify-btn" onclick="removeSelectedCard()">Banish Card</button>
             </div>
 
-            <span class="btn-group-label">Modify Rank <span class="modify-cost">Cost: 5 control</span></span>
+            <span class="btn-group-label modify-cost">Modify Rank <span class="modify-cost"></span></span>
             <div class="btn-group">
               <button type="button" class="btn modify-btn" onclick="shiftRank(-1)">-</button>
               <button type="button" class="btn modify-btn" onclick="shiftRank(1)">+</button>
             </div>
-            <span class="btn-group-label">Modify Suite <span class="modify-cost">Cost: 5 control</span></span>
+            <span class="btn-group-label modify-btn">Modify Suite <span class="modify-cost"></span></span>
             <div class="btn-group">
               <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'hearts'})">♥</button>
               <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'spades'})">♠</button>
