@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>AbyssalCards</title>
-    <link rel="stylesheet" href="css/modern-normalize.css">
-    <link rel="stylesheet" href="css/system.css">
-    <link rel="stylesheet" href="css/microtip.css">
+    <link rel="stylesheet" href="css/lib/modern-normalize.css">
+    <link rel="stylesheet" href="css/lib/system.css">
+    <link rel="stylesheet" href="css/lib/microtip.css">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/lib/vivus.js"></script>
     <script src="js/lib/localforage.js"></script>
@@ -47,17 +47,17 @@
           <div class="window-pane">
             <span class="btn-group-label">Cards</span>
             <div class="btn-group">
-              <button type="button" class="btn" id="buy-card" onclick="buyCard('ace')"></button>
-              <button type="button" class="btn modify-btn" onclick="removeSelectedCard()">Banish Card</button>
+              <button type="button" class="btn" id="buy-card" onclick="buyCard('ace')" role="tooltip" aria-label="The cost of drawing increases with the number of cards in your hand"></button>
+              <button type="button" class="btn modify-btn" onclick="removeSelectedCard()">Destroy Card</button>
             </div>
 
             <span class="btn-group-label modify-cost">Modify Rank <span class="modify-cost"></span></span>
-            <div class="btn-group">
+            <div class="btn-group" role="tooltip" aria-label="Use control to make a card more or less powerful" data-microtip-position="bottom">
               <button type="button" class="btn modify-btn" onclick="shiftRank(-1)">-</button>
               <button type="button" class="btn modify-btn" onclick="shiftRank(1)">+</button>
             </div>
             <span class="btn-group-label modify-btn">Modify Suite <span class="modify-cost"></span></span>
-            <div class="btn-group">
+            <div class="btn-group" role="tooltip" aria-label="Use control to modify a cards innate abilities" data-microtip-position="bottom">
               <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'hearts'})">♥</button>
               <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'spades'})">♠</button>
               <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'diamonds'})">♦</button>
