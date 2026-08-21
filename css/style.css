@@ -270,6 +270,10 @@ game-card[active] {
 	filter: drop-shadow(0 4px 20px rgba(10, 240, 255, 0.5)) brightness(1.05);
 }
 
+game-card:hover {
+	transform: translate(0px, -30px);
+}
+
 game-card + game-card {
 	margin-left: var(
 		--card-gap,

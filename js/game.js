@@ -6,7 +6,7 @@ const Data = {
 			["shadow", "true"],
 			["glare-intensity", "0.5"],
 			["glare-hue", "200"],
-			["scale-factor", "1.1"],
+			["scale-factor", "1"],
 			["tilt-factor", "1"],
 			["tilt-factor-y", "1"],
 		],
