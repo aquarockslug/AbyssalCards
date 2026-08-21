@@ -5,6 +5,7 @@ import Data, {
 	manaPerSec,
 	redValue,
 	state,
+	activeCard,
 	transmutePerSec,
 } from "./game.js";
 import Sparticles from "./lib/sparticles.js";
@@ -14,7 +15,6 @@ import {
 	addCard,
 	buildAchievementUI,
 	buildUpgradeUI,
-	getActiveCard,
 	hand,
 	layoutHand,
 	updateUI,
@@ -73,7 +73,7 @@ window.onload = async () => {
 	for (const c of state.cards) addCard(c.rank, c.suite, hand, false);
 
 	document.addEventListener("click", (e) => {
-		if (!e.target.closest("#left-panel")) getActiveCard()?._deselect();
+		if (!e.target.closest("#left-panel")) activeCard()?._deselect();
 	});
 	document.querySelectorAll(".title-bar .minimize").forEach((btn) => {
 		btn.addEventListener("click", (e) => {

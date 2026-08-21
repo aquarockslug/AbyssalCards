@@ -11,6 +11,13 @@ class Card extends HTMLElement {
 		this.attachShadow({ mode: "open" });
 		this._face = this._vivus = this._abortController = null;
 		this._originalRank = this._originalSuite = null;
+		addEventListener("resize", (event) => {
+			if (!this._selected) return;
+			const { left, width, top, height } = this.getBoundingClientRect();
+			const deltaX = window.innerWidth / 2 - left - width / 2;
+			const deltaY = window.innerHeight / 2 - top - height / 8;
+			this.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+		});
 	}
 
 	connectedCallback() {
@@ -50,9 +57,8 @@ class Card extends HTMLElement {
 
 		const { left, width, top, height } = this.getBoundingClientRect();
 		const deltaX = window.innerWidth / 2 - left - width / 2;
-		const deltaY = window.innerHeight / 2 - top - height / 2;
-
-		this.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(1.5)`;
+		const deltaY = window.innerHeight / 2 - top - height / 8;
+		this.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
 		this.dispatchEvent(new CustomEvent("card-select", { bubbles: true }));
 	}
 

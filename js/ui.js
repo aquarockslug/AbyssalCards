@@ -4,6 +4,7 @@ import Data, {
 	modifyCost,
 	state,
 	upgradeCost,
+	activeCard,
 } from "./game.js";
 
 export const hand = document.getElementById("hand");
@@ -71,10 +72,10 @@ export function updateUI() {
 	buyBtn.disabled = state.mana < cost;
 
 	// hide card modification spells when no card is selected
-	const activeCard = getActiveCard();
+	const card = activeCard();
 	document.querySelectorAll(".modify-cost, .modify-btn").forEach((el) => {
-		el.disabled = !activeCard;
-		el.hidden = !activeCard;
+		el.disabled = !card;
+		el.hidden = !card;
 	});
 
 	const mCost = modifyCost();
@@ -115,7 +116,7 @@ export function buildUpgradeUI() {
 		btn.setAttribute("role", "tooltip");
 		btn.setAttribute("aria-label", def.description);
 		btn.setAttribute("data-microtip-position", "bottom");
-		btn.setAttribute("data-microtip-size", "large");
+		btn.setAttribute("data-microtip-size", "fit");
 		btn.innerHTML =
 			`<span class="upgrade-name">${def.name}</span>` +
 			`<span class="upgrade-level">Lv 0</span>` +
@@ -149,8 +150,6 @@ export function buildAchievementUI() {
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
-export const getActiveCard = () => document.querySelector("game-card[active]");
-
 function spendForModification() {
 	const cost = modifyCost();
 	if (state.control < cost) return false;
@@ -160,7 +159,7 @@ function spendForModification() {
 }
 
 export function addCard(rank, suite, location, track = true) {
-	getActiveCard()?._deselect();
+	activeCard()?._deselect();
 	const card = document.createElement("game-card");
 	card.setAttribute("rank", rank || pick(Data.card.rank));
 	card.setAttribute("suite", suite || pick(Data.card.suite));
@@ -184,7 +183,7 @@ export function buyCard(rank, suite) {
 }
 
 export function removeSelectedCard() {
-	const card = getActiveCard();
+	const card = activeCard();
 	if (!card) return;
 	const idx = [...hand.querySelectorAll("game-card")].indexOf(card);
 	card.remove();
@@ -202,7 +201,7 @@ function syncCardState(card) {
 }
 
 export function modifySelectedCard(attrs) {
-	const card = getActiveCard();
+	const card = activeCard();
 	if (!card) return;
 	if (!spendForModification()) return;
 	for (const [k, v] of Object.entries(attrs)) card.setAttribute(k, v);
@@ -211,7 +210,7 @@ export function modifySelectedCard(attrs) {
 }
 
 export function shiftRank(delta) {
-	const card = getActiveCard();
+	const card = activeCard();
 	if (!card) return;
 	if (!spendForModification()) return;
 	const ranks = Data.card.rank;

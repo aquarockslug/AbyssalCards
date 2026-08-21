@@ -24,7 +24,7 @@ const Data = {
 		transmute: {
 			name: "Transmutation",
 			description: "+50% transmute power per level",
-			resource: "control",
+			resource: "energy",
 			baseCost: 15,
 			costGrowth: 2.2,
 		},
@@ -82,19 +82,18 @@ const Data = {
 	],
 	sparticle: {
 		abyss: {
-			count: 600,
-			speed: 5,
-			parallax: 17.5,
+			count: 799,
+			parallax: 17.4,
 			direction: 0,
-			xVariance: 2.5,
+			xVariance: 2.6,
 			yVariance: 7.8,
-			alphaSpeed: 12,
+			alphaSpeed: 21,
 			alphaVariance: 0,
-			minAlpha: 0.05,
-			maxAlpha: 0.6,
-			maxSize: 3,
+			minAlpha: -2,
+			maxAlpha: 2,
+			maxSize: 4,
 			style: "both",
-			drift: 6,
+			drift: 5.9,
 			spawnArea: 1,
 			color: ["#ffffff", "#68e8f6", "#3bd4f5", "#017a98", "#017a98", "#017a98"],
 		},
@@ -167,6 +166,7 @@ export function defaultState() {
 export const state = defaultState();
 window.state = state;
 
+const cardValue = (c) => (c.rank === "ace" ? 1 : Number(c.rank));
 const achievementBonus = () => {
 	let bonus = 1;
 	for (const a of Data.achievements)
@@ -187,7 +187,11 @@ export const upgradeCost = (id) => {
 	return def.baseCost * def.costGrowth ** state.upgrades[id];
 };
 
-export const modifyCost = () => 5 * 1.5 ** state.stats.totalModifications;
+// TODO modify cost should depend on the selected card
+export const modifyCost = () => {
+	// activeCard()
+	return 5;
+};
 
 export function getHandInfo() {
 	return {
@@ -199,8 +203,6 @@ export function getHandInfo() {
 		},
 	};
 }
-
-const cardValue = (c) => (c.rank === "ace" ? 1 : Number(c.rank));
 
 export function redValue() {
 	const { hearts, diamonds } = getHandInfo().suite;
@@ -228,5 +230,7 @@ export function buyUpgrade(id) {
 	state.stats.totalUpgrades++;
 	return true;
 }
+
+export const activeCard = () => document.querySelector("game-card[active]");
 
 window.buyUpgrade = buyUpgrade;
