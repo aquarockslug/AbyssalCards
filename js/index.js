@@ -1,12 +1,12 @@
 import Data, {
 	checkAchievements,
-	getBoardInfo,
+	getHandInfo,
 	manaPerSec,
 	state,
 	transmutePerSec,
 } from "./game.js";
 import Sparticles from "./lib/sparticles.js";
-import { applyOfflineProgress, load, startAutosave } from "./save.js";
+import { load, startAutosave } from "./save.js";
 import "./game-card.js";
 import {
 	addCard,
@@ -15,7 +15,6 @@ import {
 	getActiveCard,
 	hand,
 	layoutHand,
-	renderBoard,
 	updateUI,
 } from "./ui.js";
 
@@ -29,7 +28,7 @@ function gameTick(dt) {
 	state.mana += manaPerSec() * (dt / 1000);
 	state.stats.totalMana += manaPerSec() * (dt / 1000);
 
-	const { hearts, diamonds, spades, clubs } = getBoardInfo();
+	const { hearts, diamonds, spades, clubs } = getHandInfo();
 	const rate = transmutePerSec();
 
 	function transmute(resource, count) {
@@ -68,7 +67,6 @@ window.onload = async () => {
 	buildAchievementUI();
 
 	for (const c of state.cards) addCard(c.rank, c.suite, hand, false);
-	renderBoard();
 
 	document.addEventListener("click", (e) => {
 		if (!e.target.closest("#left-panel")) getActiveCard()?._deselect();
@@ -84,6 +82,5 @@ window.onload = async () => {
 	updateUI();
 	window.addEventListener("resize", () => {
 		layoutHand();
-		renderBoard();
 	});
 };

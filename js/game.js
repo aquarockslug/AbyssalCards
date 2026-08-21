@@ -163,7 +163,6 @@ export function defaultState() {
 		energy: 0,
 		control: 0,
 		cards: [],
-		board: [],
 		upgrades: { manaFlow: 0, transmute: 0, handGrowth: 0 },
 		stats: {
 			totalCardsDrawn: 0,
@@ -208,15 +207,6 @@ export function getHandInfo() {
 		diamonds: state.cards.filter((c) => c.suite === "diamonds").length,
 		spades: state.cards.filter((c) => c.suite === "spades").length,
 		clubs: state.cards.filter((c) => c.suite === "clubs").length,
-	};
-}
-
-export function getBoardInfo() {
-	return {
-		hearts: state.board.filter((c) => c && c.suite === "hearts").length,
-		diamonds: state.board.filter((c) => c && c.suite === "diamonds").length,
-		spades: state.board.filter((c) => c && c.suite === "spades").length,
-		clubs: state.board.filter((c) => c && c.suite === "clubs").length,
 	};
 }
 

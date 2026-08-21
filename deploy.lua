@@ -53,7 +53,6 @@ build({
 	"./js/ui.js",
 	"./js/save.js",
 	"./js/lib/hover-tilt.js",
-	"./js/lib/isomer.js",
 	"./js/lib/localforage.js",
 	"./js/lib/sparticles.js",
 	"./js/lib/vivus.js",

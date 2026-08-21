@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="css/microtip.css">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/lib/vivus.js"></script>
-    <script src="js/lib/isomer.js"></script>
     <script src="js/lib/localforage.js"></script>
     <script type="module" src="js/index.js"></script>
   </head>
@@ -38,7 +37,7 @@
         </div>
       </div>
 
-      <div id="board-layout">
+      <div id="main-layout">
         <aside class="window" id="left-panel">
           <header class="title-bar">
             <button type="button" class="close hidden"><span>Close</span></button>
@@ -50,7 +49,6 @@
             <div class="btn-group">
               <button type="button" class="btn" id="buy-card" onclick="buyCard()">Draw Card (5 mana)</button>
               <button type="button" class="btn" onclick="removeSelectedCard()">Banish Card</button>
-              <button type="button" class="btn" onclick="playSelectedCard()">Play Card</button>
             </div>
 
             <span class="btn-group-label">Modify Rank <span class="modify-cost">Cost: 5 control</span></span>
@@ -67,10 +65,6 @@
             </div>
           </div>
         </aside>
-
-        <div id="board" style="min-height:500px">
-          <div class="board-hint">Select a card, then click a tile to play it</div>
-        </div>
 
         <aside class="window" id="right-panel">
           <header class="title-bar">

@@ -32,7 +32,7 @@ export async function load() {
 		Object.assign(state.stats, defaultState().stats, data.stats);
 		if (!Array.isArray(state.achievements)) state.achievements = [];
 		if (!Array.isArray(state.cards)) state.cards = [];
-		if (!Array.isArray(state.board)) state.board = [];
+		delete state.board; // legacy saves stored cards on a board
 	} catch (e) {
 		console.error("Failed to load save:", e);
 	}

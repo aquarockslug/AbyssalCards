@@ -9,8 +9,5 @@ https://sparticlesjs.dev/
 ## Card Hover Effects
 https://hover-tilt.simey.me/
 
-## Isometric Rendering
-https://jdan.github.io/isomer/
-
 ## Tooltips
 https://microtip.vercel.app/
