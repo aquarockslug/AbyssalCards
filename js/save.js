@@ -51,17 +51,6 @@ export function resetGame() {
 		});
 }
 
-export function applyOfflineProgress() {
-	const elapsed = Math.min(
-		Math.max(Date.now() - state.lastSeen, 0),
-		OFFLINE_CAP,
-	);
-	if (elapsed < 5000) return;
-	const gained = manaPerSec() * (elapsed / 1000);
-	state.mana += gained;
-	state.stats.totalMana += gained;
-}
-
 export function startAutosave() {
 	saveInterval = setInterval(save, 10000);
 	window.addEventListener("beforeunload", () => {

@@ -69,7 +69,6 @@ window.onload = async () => {
 
 	for (const c of state.cards) addCard(c.rank, c.suite, hand, false);
 	renderBoard();
-	applyOfflineProgress();
 
 	document.addEventListener("click", (e) => {
 		if (!e.target.closest("#left-panel")) getActiveCard()?._deselect();
