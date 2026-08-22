@@ -5,8 +5,8 @@ const Data = {
 		background: "#3bd4f5",
 		effects: [
 			// https://hover-tilt.simey.me/options/props/
-			["shadow", "true"],
-			["glare-intensity", "0.5"],
+			["shadow", "false"],
+			["glare-intensity", "0.33"],
 			["glare-hue", "200"],
 			["scale-factor", "1"],
 			["tilt-factor", "1"],
@@ -169,7 +169,7 @@ export const upgradeCost = (id) => {
 };
 
 export const modifyCost = () =>
-	activeCard() ? cardValue(activeCard()) * 10 : undefined;
+	activeCard() ? cardValue(activeCard()) * 5 : undefined;
 
 export function redValue() {
 	return getCards(

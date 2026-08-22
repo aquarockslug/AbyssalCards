@@ -131,9 +131,31 @@ class Card extends HTMLElement {
 				p.style.stroke = "#fff";
 				p.style.fillOpacity = "0";
 			});
+
+			this._updateGlow();
 		} catch (e) {
 			if (e.name !== "AbortError") console.error("Card fetch error:", e);
 		}
+	}
+
+	_updateGlow() {
+		const rank = this.getAttribute("rank");
+		const suite = this.getAttribute("suite");
+		if (!this._face || !rank || !suite) return;
+
+		const value = rank === "ace" ? 1 : Number(rank);
+		if (!Number.isFinite(value)) return;
+		const strength = Math.min(Math.max((value - 3) / 9, 0), 1);
+
+		const [r, g, b] =
+			suite === "hearts" || suite === "diamonds"
+				? [255, 45, 85]
+				: [52, 211, 153];
+
+		const blur = Math.round(15 + 75 * strength);
+		const spread = Math.round(2 + 13 * strength);
+		const alpha = (0.35 + 0.55 * strength).toFixed(2);
+		this._face.style.boxShadow = `0px 0px ${blur}px ${spread}px rgba(${r},${g},${b},${alpha})`;
 	}
 }
 
