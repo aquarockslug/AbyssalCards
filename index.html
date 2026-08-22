@@ -62,10 +62,10 @@
               <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'diamonds'})">♦</button>
               <button type="button" class="btn modify-btn" onclick="modifySelectedCard({suite:'clubs'})">♣</button>
             </div>
-            <span class="btn-group-label modify-btn">Combine <span class="modify-cost"></span></span>
+            <span class="btn-group-label modify-btn combine-label">Combine <span class="modify-cost"></span></span>
             <div class="btn-group" role="tooltip" aria-label="Combine the two selected cards" data-microtip-position="bottom" data-microtip-size="fit">
-              <button type="button" class="btn modify-btn" onclick="console.log('shrink and move the active card into this button')"></button>
-              <button type="button" class="btn modify-btn" onclick="console.log('shrink and move the active card into this button')"></button>
+              <button type="button" class="combine-btn modify-btn" onclick="placeInCombineSlot(0)"></button>
+              <button type="button" class="combine-btn modify-btn" onclick="placeInCombineSlot(1)"></button>
             </div>
           </div>
         </aside>

@@ -95,13 +95,18 @@ export function updateUI() {
 	buyBtn.textContent = `Draw Ace (${fmt(cost)} mana)`;
 	buyBtn.disabled = state.mana < cost;
 
-	// hide card modification spells when no card is selected
+	// hide card modification spells when no card is selected,
+	// but keep the combine slots visible while they hold cards
 	const card = activeCard();
+	const combining = Boolean(combineSlots[0] || combineSlots[1]);
 	document
 		.querySelectorAll(".modify-cost, .modify-btn, #destroy-card")
 		.forEach((el) => {
 			el.disabled = !card;
-			el.hidden = !card;
+			const isCombineUI =
+				el.classList.contains("combine-btn") ||
+				Boolean(el.closest(".combine-label"));
+			el.hidden = !card && !(combining && isCombineUI);
 		});
 
 	const mCost = modifyCost();
@@ -220,8 +225,78 @@ export function shiftRank(delta) {
 	updateUI();
 }
 
+const combineSlots = [null, null];
+
+export function placeInCombineSlot(i) {
+	const card = activeCard();
+	if (!card || combineSlots[i]) return;
+	if (!spendForModification()) return;
+
+	const btn = document.querySelectorAll(".combine-btn")[i];
+	const rank = card.getAttribute("rank");
+	const suite = card.getAttribute("suite");
+
+	// measure while the card is still in its selected pose
+	const first = card.getBoundingClientRect();
+
+	// deselect manually; _deselect() resets the transform on the next
+	// frame, which would fight the fly-to-slot transform below
+	card._selected = false;
+	card.removeAttribute("active");
+	const tilt = card.shadowRoot?.querySelector("hover-tilt");
+	if (tilt && card._prevScaleFactor != null)
+		tilt.setAttribute("scale-factor", card._prevScaleFactor);
+
+	// leave a static mini face behind in the outline
+	const face = card.querySelector("svg")?.cloneNode(true);
+	if (face) face.style.boxShadow = "";
+	const slotFace = document.createElement("span");
+	slotFace.className = "slot-face";
+	if (face) slotFace.appendChild(face);
+	btn.replaceChildren(slotFace);
+
+	// shrink + glide the card into the button's outline
+	const last = slotFace.getBoundingClientRect();
+	card.style.pointerEvents = "none";
+	card.style.zIndex = "100";
+	card.style.transformOrigin = "top left";
+	card.style.transform =
+		`translate(${first.left - last.left}px, ${first.top - last.top}px) ` +
+		`scale(${first.width / last.width})`;
+
+	combineSlots[i] = { rank, suite };
+	window.data.sfx.magic();
+
+	// card transition runs 0.4s; clean up once it has landed
+	setTimeout(() => {
+		const idx = [...hand.querySelectorAll("game-card")].indexOf(card);
+		card.remove();
+		if (idx >= 0 && state.cards[idx]) state.cards.splice(idx, 1);
+		layoutHand();
+		updateUI();
+	}, 450);
+
+	if (combineSlots[0] && combineSlots[1]) setTimeout(performCombine, 600);
+}
+
+function performCombine() {
+	const [a, b] = combineSlots;
+	combineSlots[0] = combineSlots[1] = null;
+	document.querySelectorAll(".combine-btn").forEach((btn) => {
+		btn.replaceChildren();
+	});
+
+	// ranks sum, capped at 10; result keeps the first card's suite
+	const value = (r) => (r === "ace" ? 1 : Number(r));
+	const total = Math.min(value(a.rank) + value(b.rank), 10);
+	addCard(total === 1 ? "ace" : String(total), a.suite, hand);
+	window.data.sfx.draw();
+	updateUI();
+}
+
 window.addRandomCard = () => addCard(null, null, hand);
 window.modifySelectedCard = modifySelectedCard;
 window.shiftRank = shiftRank;
 window.buyCard = buyCard;
 window.removeSelectedCard = removeSelectedCard;
+window.placeInCombineSlot = placeInCombineSlot;

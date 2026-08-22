@@ -324,6 +324,42 @@ game-card + game-card {
 	margin-left: 6px;
 }
 
+/* ---- Combine Slots ---- */
+.combine-btn {
+	position: relative;
+	width: 72px;
+	aspect-ratio: 5 / 7;
+	padding: 3px;
+	background: transparent;
+	border: 2px dashed color-mix(in srgb, var(--secondary) 55%, transparent);
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.combine-btn[hidden] {
+	display: none;
+}
+
+.combine-btn:disabled {
+	border-color: var(--disabled);
+	cursor: not-allowed;
+}
+
+.combine-btn .slot-face {
+	position: absolute;
+	inset: 3px;
+	display: block;
+	border-radius: 7px;
+	overflow: hidden;
+	background: #3bd4f5;
+}
+
+.combine-btn .slot-face svg {
+	width: 100%;
+	height: 100%;
+	display: block;
+}
+
 /* ---- Gains Stats ---- */
 .stat-list {
 	margin: 0;
