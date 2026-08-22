@@ -56,6 +56,7 @@ build({
 	"./js/lib/localforage.js",
 	"./js/lib/sparticles.js",
 	"./js/lib/vivus.js",
+	"./js/lib/ZzFX.js"
 	table.concat(cards, " "),
 })
 push("./index.zip", "aquarock/abyssalcards", "html5")

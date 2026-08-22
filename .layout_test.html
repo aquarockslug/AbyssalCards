@@ -117,5 +117,5 @@
       </div>
     </div>
     <div id="hand"></div>
-  </body>
+  <script>window.addEventListener("load",()=>{setTimeout(()=>{const out=[...document.querySelectorAll("#main-layout .window")].map(w=>{const r=w.getBoundingClientRect();return [w.id,Math.round(r.width),Math.round(r.height),Math.round(r.x),Math.round(r.y),w.classList.contains("minimized")]}) ;document.body.insertAdjacentHTML("beforeend","<pre id=report>"+JSON.stringify(out)+"</pre>")},300)});</script></body>
 </html>

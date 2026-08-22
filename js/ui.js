@@ -127,10 +127,6 @@ export function updateUI() {
 
 export function buildUpgradeUI() {
 	const container = document.getElementById("upgrades");
-	const label = document.createElement("span");
-	label.className = "btn-group-label";
-	label.textContent = "Upgrades";
-	container.appendChild(label);
 	for (const [id, def] of Object.entries(Data.upgrades)) {
 		const btn = document.createElement("button");
 		btn.className = "btn upgrade-btn";
@@ -152,10 +148,6 @@ export function buildUpgradeUI() {
 
 export function buildAchievementUI() {
 	const container = document.getElementById("achievements");
-	const label = document.createElement("span");
-	label.className = "btn-group-label";
-	label.textContent = "Achievements";
-	container.appendChild(label);
 	for (const a of Data.achievements) {
 		const div = document.createElement("div");
 		div.className = "achievement";
