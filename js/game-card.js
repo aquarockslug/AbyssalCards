@@ -119,11 +119,13 @@ class Card extends HTMLElement {
 				? this.replaceChild(this._face, oldFace)
 				: this.appendChild(this._face);
 
-			if (isChanged)
+			if (isChanged) {
+				window.data.sfx.magic();
 				this._vivus = new Vivus(this._face, {
 					type: "sync",
-					duration: 40,
+					duration: 20,
 				});
+			}
 
 			this._face.querySelectorAll("path").forEach((p) => {
 				p.style.stroke = "#fff";

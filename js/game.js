@@ -1,3 +1,5 @@
+import { zzfx } from "./lib/ZzFX.js";
+
 const Data = {
 	card: {
 		background: "#3bd4f5",
@@ -18,7 +20,7 @@ const Data = {
 			name: "Mana Flow",
 			description: "+25% mana generation per level",
 			resource: "energy",
-			baseCost: 15,
+			baseCost: 5,
 			costGrowth: 1.6,
 		},
 		transmute: {
@@ -36,50 +38,6 @@ const Data = {
 			costGrowth: 2,
 		},
 	},
-	achievements: [
-		{
-			id: "energized",
-			name: "Energized",
-			description: "Gain 100 total energy",
-			bonus: 0.15,
-			check: (s) => s.stats.totalEnergy >= 100,
-		},
-		{
-			id: "overcharged",
-			name: "Overcharged",
-			description: "Gain 1,000 total energy",
-			bonus: 0.25,
-			check: (s) => s.stats.totalEnergy >= 1000,
-		},
-		{
-			id: "controlling",
-			name: "Controlling",
-			description: "Gain 100 total control",
-			bonus: 0.15,
-			check: (s) => s.stats.totalControl >= 100,
-		},
-		{
-			id: "dominating",
-			name: "Dominating",
-			description: "Gain 1,000 total control",
-			bonus: 0.25,
-			check: (s) => s.stats.totalControl >= 1000,
-		},
-		{
-			id: "apprentice",
-			name: "Apprentice",
-			description: "Buy 5 upgrades",
-			bonus: 0.1,
-			check: (s) => s.stats.totalUpgrades >= 5,
-		},
-		{
-			id: "journeyman",
-			name: "Journeyman",
-			description: "Buy 10 upgrades",
-			bonus: 0.1,
-			check: (s) => s.stats.totalUpgrades >= 10,
-		},
-	],
 	sparticle: {
 		abyss: {
 			count: 799,
@@ -138,6 +96,13 @@ const Data = {
 			shape: ["star", "circle"],
 		},
 	},
+	// biome-ignore format: sfx
+	sfx: {
+		ui: () => zzfx(...[,,453,.01,,.02,2,2.6,76,34,,,,.5,,,.49,.92]),
+		magic: () => zzfx(...[,0,261.6256,.2,.07,.45,1,,,,,,,.1,,.1,,.44,.13]),
+		draw: () => zzfx(...[0.5,,363,,.09,.05,1,3.4,,,495,.1,.05,,,,,.74,.02]),
+		discard: () => zzfx(...[0.8,,38,.04,.12,.25,4,.6,,1,,,,.4,,.9,,.38,.06])
+	},
 };
 
 export default Data;
@@ -158,7 +123,6 @@ export function defaultState() {
 			totalEnergy: 0,
 			totalControl: 0,
 		},
-		achievements: [],
 		lastSeen: Date.now(),
 	};
 }
@@ -166,16 +130,10 @@ export function defaultState() {
 export const state = defaultState();
 window.state = state;
 
-const cardValue = (c) => (c.rank === "ace" ? 1 : Number(c.rank));
-const achievementBonus = () => {
-	let bonus = 1;
-	for (const a of Data.achievements)
-		if (state.achievements.includes(a.id)) bonus += a.bonus;
-	return bonus;
-};
+const cardValue = (c) =>
+	c.getAttribute("rank") === "ace" ? 1 : Number(c.getAttribute("rank"));
 
-export const manaPerSec = () =>
-	1 * (1 + 0.25 * state.upgrades.manaFlow) * achievementBonus();
+export const manaPerSec = () => 1 * (1 + 0.25 * state.upgrades.manaFlow);
 
 export const transmutePerSec = () => 0.1 * (1 + 0.5 * state.upgrades.transmute);
 
@@ -210,39 +168,19 @@ export const upgradeCost = (id) => {
 	return def.baseCost * def.costGrowth ** state.upgrades[id];
 };
 
-// TODO modify cost should depend on the selected card
-export const modifyCost = () => {
-	// activeCard()
-	return 5;
-};
-
-export function getHandInfo() {
-	return {
-		suite: {
-			hearts: state.cards.filter((c) => c.suite === "hearts"),
-			diamonds: state.cards.filter((c) => c.suite === "diamonds"),
-			spades: state.cards.filter((c) => c.suite === "spades"),
-			clubs: state.cards.filter((c) => c.suite === "clubs"),
-		},
-	};
-}
+export const modifyCost = () =>
+	activeCard() ? cardValue(activeCard()) * 10 : undefined;
 
 export function redValue() {
-	const { hearts, diamonds } = getHandInfo().suite;
-	return [...hearts, ...diamonds].reduce((acc, c) => acc + cardValue(c), 0);
+	return getCards(
+		"game-card[suite='diamonds'], game-card[suite='hearts']",
+	).reduce((acc, c) => acc + cardValue(c), 0);
 }
 
 export function blackValue() {
-	const { spades, clubs } = getHandInfo().suite;
-	return [...spades, ...clubs].reduce((acc, c) => acc + cardValue(c), 0);
-}
-
-export function checkAchievements() {
-	for (const a of Data.achievements) {
-		if (state.achievements.includes(a.id)) continue;
-		if (!a.check(state)) continue;
-		state.achievements.push(a.id);
-	}
+	return getCards(
+		"game-card[suite='spades'], game-card[suite='clubs'] ",
+	).reduce((acc, c) => acc + cardValue(c), 0);
 }
 
 export function buyUpgrade(id) {
@@ -255,5 +193,6 @@ export function buyUpgrade(id) {
 }
 
 export const activeCard = () => document.querySelector("game-card[active]");
+export const getCards = (query) => Array.from(document.querySelectorAll(query));
 
 window.buyUpgrade = buyUpgrade;

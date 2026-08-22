@@ -30,9 +30,9 @@ export async function load() {
 		Object.assign(state, data);
 		Object.assign(state.upgrades, defaultState().upgrades, data.upgrades);
 		Object.assign(state.stats, defaultState().stats, data.stats);
-		if (!Array.isArray(state.achievements)) state.achievements = [];
 		if (!Array.isArray(state.cards)) state.cards = [];
 		delete state.board; // legacy saves stored cards on a board
+		delete state.achievements; // legacy saves tracked achievements
 	} catch (e) {
 		console.error("Failed to load save:", e);
 	}

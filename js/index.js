@@ -1,8 +1,6 @@
 import Data, {
 	activeCard,
 	blackValue,
-	checkAchievements,
-	getHandInfo,
 	manaPerSec,
 	redValue,
 	state,
@@ -12,17 +10,9 @@ import Data, {
 import Sparticles from "./lib/sparticles.js";
 import { load, startAutosave } from "./save.js";
 import "./game-card.js";
-import {
-	addCard,
-	buildAchievementUI,
-	buildUpgradeUI,
-	hand,
-	layoutHand,
-	updateUI,
-} from "./ui.js";
+import { addCard, buildUpgradeUI, hand, layoutHand, updateUI } from "./ui.js";
 
 window.Data = Data;
-window.hand = getHandInfo;
 
 // ---------- game loop ----------
 
@@ -52,7 +42,6 @@ function gameTick(dt) {
 	// black cards transmute control from mana
 	if (black > 0) transmute("control", black);
 
-	checkAchievements();
 	updateUI();
 }
 
@@ -70,7 +59,6 @@ window.onload = async () => {
 	new Sparticles(document.getRootNode().body, Data.sparticle.abyss);
 	await load();
 	buildUpgradeUI();
-	buildAchievementUI();
 
 	for (const c of state.cards) addCard(c.rank, c.suite, hand, false);
 

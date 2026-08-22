@@ -6,8 +6,11 @@ https://maxwellito.github.io/vivus/
 ## Particle Effects
 https://sparticlesjs.dev/
 
-## Card Hover Effects
+## Card Tilt Effect
 https://hover-tilt.simey.me/
 
 ## Tooltips
 https://microtip.vercel.app/
+
+## SFX
+https://killedbyapixel.github.io/ZzFX/

@@ -56,6 +56,8 @@ new MutationObserver(layoutHand).observe(hand, {
 	subtree: true,
 });
 
+addEventListener("card-select", () => window.data.sfx.ui());
+
 export const fmt = (n) => {
 	if (!Number.isFinite(n)) return "∞";
 	if (n < 0) return `-${fmt(-n)}`;
@@ -119,10 +121,6 @@ export function updateUI() {
 			`Lv ${state.upgrades[id]}`;
 		btn.disabled = state[def.resource] < c;
 	});
-
-	document.querySelectorAll(".achievement").forEach((el) => {
-		el.classList.toggle("unlocked", state.achievements.includes(el.dataset.id));
-	});
 }
 
 export function buildUpgradeUI() {
@@ -143,22 +141,6 @@ export function buildUpgradeUI() {
 			if (buyUpgrade(id)) updateUI();
 		});
 		container.appendChild(btn);
-	}
-}
-
-export function buildAchievementUI() {
-	const container = document.getElementById("achievements");
-	for (const a of Data.achievements) {
-		const div = document.createElement("div");
-		div.className = "achievement";
-		div.dataset.id = a.id;
-		div.innerHTML =
-			`<span class="achievement-top">` +
-			`<span class="achievement-name">${a.name}</span>` +
-			`<span class="achievement-bonus">+${Math.round(a.bonus * 100)}% mana</span>` +
-			`</span>` +
-			`<span class="achievement-desc">${a.description}</span>`;
-		container.appendChild(div);
 	}
 }
 
@@ -193,6 +175,7 @@ export function buyCard(rank, suite) {
 	if (state.mana < cardCost()) return;
 	state.mana -= cardCost();
 	addCard(rank, suite, hand);
+	window.data.sfx.draw();
 	updateUI();
 }
 
@@ -201,6 +184,7 @@ export function removeSelectedCard() {
 	if (!card) return;
 	const idx = [...hand.querySelectorAll("game-card")].indexOf(card);
 	card.remove();
+	window.data.sfx.discard();
 	if (idx >= 0 && state.cards[idx]) state.cards.splice(idx, 1);
 	layoutHand();
 	updateUI();
