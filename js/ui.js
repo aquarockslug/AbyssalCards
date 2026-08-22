@@ -97,10 +97,12 @@ export function updateUI() {
 
 	// hide card modification spells when no card is selected
 	const card = activeCard();
-	document.querySelectorAll(".modify-cost, .modify-btn").forEach((el) => {
-		el.disabled = !card;
-		el.hidden = !card;
-	});
+	document
+		.querySelectorAll(".modify-cost, .modify-btn, #destroy-card")
+		.forEach((el) => {
+			el.disabled = !card;
+			el.hidden = !card;
+		});
 
 	const mCost = modifyCost();
 	document.querySelectorAll(".modify-cost").forEach((el) => {

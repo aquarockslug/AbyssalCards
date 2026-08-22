@@ -205,8 +205,9 @@ canvas.sparticles {
 }
 
 /* The Spells window is a large pane covering the entire left side,
-   with the remaining windows stacked alongside it on the right. */
-#left-panel {
+   with the remaining windows stacked alongside it on the right.
+   Uses two IDs to out-rank the shared `#main-layout .window` height. */
+#main-layout #left-panel {
 	grid-column: 1;
 	grid-row: 1 / span 3;
 	height: auto;
@@ -427,7 +428,7 @@ game-card + game-card {
 		grid-template-columns: 1fr;
 	}
 
-	#left-panel {
+	#main-layout #left-panel {
 		grid-row: auto;
 		height: 240px;
 		align-self: auto;
