@@ -1,16 +1,21 @@
 import Data, {
+	activeCard,
 	buyUpgrade,
 	cardCost,
 	modifyCost,
+	resourceRates,
 	state,
 	upgradeCost,
-	activeCard,
 } from "./game.js";
 
 export const hand = document.getElementById("hand");
 const energyEl = document.getElementById("energy");
 const manaEl = document.getElementById("mana");
 const controlEl = document.getElementById("control");
+const manaRateEl = document.getElementById("mana-rate");
+const energyRateEl = document.getElementById("energy-rate");
+const controlRateEl = document.getElementById("control-rate");
+const cardStatsEl = document.getElementById("card-stats");
 
 const HAND_SCALE = 0.85;
 const MAX_GAP = 115;
@@ -61,10 +66,27 @@ export const fmt = (n) => {
 	return n.toFixed(2);
 };
 
+const fmtRate = (n) => {
+	if (!Number.isFinite(n)) return "∞";
+	if (Math.abs(n) < 0.05) return "0";
+	if (n < 0) return `-${fmtRate(-n)}`;
+	if (n >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
+	if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+	if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+	if (n >= 10) return n.toFixed(0);
+	return n.toFixed(1);
+};
+
 export function updateUI() {
 	manaEl.textContent = fmt(state.mana);
 	energyEl.textContent = fmt(state.energy);
 	controlEl.textContent = fmt(state.control);
+
+	const rates = resourceRates();
+	manaRateEl.textContent = `${fmtRate(rates.mana)}/s`;
+	energyRateEl.textContent = `${fmtRate(rates.energy)}/s`;
+	controlRateEl.textContent = `${fmtRate(rates.control)}/s`;
+	cardStatsEl.textContent = state.cards.length;
 
 	const cost = cardCost();
 	const buyBtn = document.getElementById("buy-card");

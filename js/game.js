@@ -179,6 +179,29 @@ export const manaPerSec = () =>
 
 export const transmutePerSec = () => 0.1 * (1 + 0.5 * state.upgrades.transmute);
 
+const TRACKED_RESOURCES = ["mana", "energy", "control"];
+const RATE_SMOOTHING = 0.15;
+let lastSample = null;
+const observedRates = { mana: 0, energy: 0, control: 0 };
+
+export function trackRates(dtMs) {
+	const dt = dtMs / 1000;
+	const sample = Object.fromEntries(
+		TRACKED_RESOURCES.map((r) => [r, state[r]]),
+	);
+	if (!lastSample || dt <= 0) {
+		lastSample = sample;
+		return;
+	}
+	for (const r of TRACKED_RESOURCES) {
+		const instant = (sample[r] - lastSample[r]) / dt;
+		observedRates[r] += (instant - observedRates[r]) * RATE_SMOOTHING;
+	}
+	lastSample = sample;
+}
+
+export const resourceRates = () => ({ ...observedRates });
+
 export const cardCost = () =>
 	5 * 3 ** state.cards.length * 0.9 ** state.upgrades.handGrowth;
 

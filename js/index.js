@@ -1,11 +1,12 @@
 import Data, {
+	activeCard,
 	blackValue,
 	checkAchievements,
 	getHandInfo,
 	manaPerSec,
 	redValue,
 	state,
-	activeCard,
+	trackRates,
 	transmutePerSec,
 } from "./game.js";
 import Sparticles from "./lib/sparticles.js";
@@ -28,6 +29,7 @@ window.hand = getHandInfo;
 let lastTime = null;
 
 function gameTick(dt) {
+	trackRates(dt);
 	state.mana += manaPerSec() * (dt / 1000);
 	state.stats.totalMana += manaPerSec() * (dt / 1000);
 
