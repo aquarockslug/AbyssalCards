@@ -155,6 +155,9 @@ canvas.sparticles {
 #control-display .resource-value {
 	color: #34d399;
 }
+#essence-display .resource-value {
+	color: #fbbf24;
+}
 
 /* ---- Tooltips (microtip) ---- */
 [role~="tooltip"][data-microtip-position|="bottom"]::after {
@@ -393,18 +396,32 @@ game-card + game-card {
 .upgrade-btn {
 	display: flex;
 	flex-direction: column;
-	align-items: flex-start;
-	gap: 1px;
+	align-items: stretch;
+	gap: 2px;
 	width: 100%;
 	padding: 6px 10px;
 	text-align: left;
 	cursor: pointer;
 }
 
+.upgrade-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 12px;
+}
+
 .upgrade-name {
 	color: var(--secondary);
 	font-weight: bold;
 	font-size: 24px;
+}
+
+.upgrade-meta {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	white-space: nowrap;
 }
 
 .upgrade-level {
@@ -420,11 +437,17 @@ game-card + game-card {
 	font-size: 22px;
 }
 
+.upgrade-desc {
+	color: var(--sys-color-grey);
+	font-size: 20px;
+	line-height: 1.25;
+}
+
 .upgrade-btn:disabled {
 	cursor: not-allowed;
 }
 
-.upgrade-btn:disabled > span {
+.upgrade-btn:disabled span {
 	opacity: 0.55;
 }
 

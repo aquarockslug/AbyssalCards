@@ -1,9 +1,10 @@
+import { resourceRates } from "./gains.js";
 import Data, {
 	activeCard,
 	buyUpgrade,
 	cardCost,
+	essenceFromCard,
 	modifyCost,
-	resourceRates,
 	state,
 	upgradeCost,
 } from "./game.js";
@@ -12,12 +13,15 @@ export const hand = document.getElementById("hand");
 const energyEl = document.getElementById("energy");
 const manaEl = document.getElementById("mana");
 const controlEl = document.getElementById("control");
+const essenceEl = document.getElementById("essence");
 const energyDisplayEl = document.getElementById("energy-display");
 const manaDisplayEl = document.getElementById("mana-display");
 const controlDisplayEl = document.getElementById("control-display");
+const essenceDisplayEl = document.getElementById("essence-display");
 const manaRateEl = document.getElementById("mana-rate");
 const energyRateEl = document.getElementById("energy-rate");
 const controlRateEl = document.getElementById("control-rate");
+const essenceRateEl = document.getElementById("essence-rate");
 const cardStatsEl = document.getElementById("card-stats");
 
 const HAND_SCALE = 0.85;
@@ -86,15 +90,25 @@ export function updateUI() {
 	manaEl.textContent = fmt(state.mana);
 	energyEl.textContent = fmt(state.energy);
 	controlEl.textContent = fmt(state.control);
+	essenceEl.textContent = fmt(state.essence);
 
 	const rates = resourceRates();
 	manaRateEl.textContent = `${fmtRate(rates.mana)}/s`;
 	energyRateEl.textContent = `${fmtRate(rates.energy)}/s`;
 	controlRateEl.textContent = `${fmtRate(rates.control)}/s`;
+	essenceRateEl.textContent = `${fmtRate(rates.essence)}/s`;
 	cardStatsEl.textContent = state.cards.length;
 
-	energyDisplayEl.style.display = rates.energy <= 0 ? "none" : "flex";
-	controlDisplayEl.style.display = rates.control <= 0 ? "none" : "flex";
+	// hide resouces which have never been gained before
+	const showEnergy = state.stats.totalEnergy <= 0 ? "none" : "flex";
+	energyDisplayEl.style.display = showEnergy;
+	energyRateEl.parentElement.style.display = showEnergy;
+	const showControl = state.stats.totalControl <= 0 ? "none" : "flex";
+	controlDisplayEl.style.display = showControl;
+	controlRateEl.parentElement.style.display = showControl;
+	const showEssence = state.stats.totalEssence <= 0 ? "none" : "flex";
+	essenceDisplayEl.style.display = showEssence;
+	essenceRateEl.parentElement.style.display = showEssence;
 
 	const cost = cardCost();
 	const buyBtn = document.getElementById("buy-card");
@@ -142,14 +156,14 @@ export function buildUpgradeUI() {
 		const btn = document.createElement("button");
 		btn.className = "btn upgrade-btn";
 		btn.dataset.id = id;
-		btn.setAttribute("role", "tooltip");
-		btn.setAttribute("aria-label", def.description);
-		btn.setAttribute("data-microtip-position", "bottom");
-		btn.setAttribute("data-microtip-size", "fit");
 		btn.innerHTML =
+			`<span class="upgrade-head">` +
 			`<span class="upgrade-name">${def.name}</span>` +
+			`<span class="upgrade-meta">` +
 			`<span class="upgrade-level">Lv 0</span>` +
-			`<span class="upgrade-cost"></span>`;
+			`<span class="upgrade-cost"></span>` +
+			`</span></span>` +
+			`<span class="upgrade-desc">${def.description}</span>`;
 		btn.addEventListener("click", () => {
 			if (buyUpgrade(id)) updateUI();
 		});
@@ -196,6 +210,10 @@ export function removeSelectedCard() {
 	const card = activeCard();
 	if (!card) return;
 	const idx = [...hand.querySelectorAll("game-card")].indexOf(card);
+	const gain = essenceFromCard(card);
+	state.essence += gain;
+	state.stats.totalEssence += gain;
+	state.stats.totalCardsDestroyed++;
 	card.remove();
 	window.data.sfx.discard();
 	if (idx >= 0 && state.cards[idx]) state.cards.splice(idx, 1);

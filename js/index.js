@@ -1,10 +1,10 @@
+import { trackRates } from "./gains.js";
 import Data, {
 	activeCard,
 	blackValue,
 	manaPerSec,
 	redValue,
 	state,
-	trackRates,
 	transmutePerSec,
 } from "./game.js";
 import Sparticles from "./lib/sparticles.js";

@@ -49,6 +49,7 @@ build({
 	"./css/icon/select-button.svg",
 	"./js/index.js",
 	"./js/game.js",
+	"./js/gains.js",
 	"./js/game-card.js",
 	"./js/ui.js",
 	"./js/save.js",
