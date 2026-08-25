@@ -209,7 +209,7 @@ export const essenceFromCard = (c) =>
 	Math.max(1, Math.round((cardValue(c) / 2) * worldMult("essence")));
 
 export const manaPerSec = () =>
-	0.85 * (1 + 0.25 * state.upgrades.manaFlow) * worldMult("mana");
+	1 * (1 + 0.25 * state.upgrades.manaFlow) * worldMult("mana");
 
 export const transmutePerSec = () =>
 	0.1 * (1 + 0.5 * state.upgrades.transmute) * worldMult("transmute");
