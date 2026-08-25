@@ -38,6 +38,55 @@ const Data = {
 			costGrowth: 2,
 		},
 	},
+	world: {
+		sun: {
+			name: "The Sun",
+			verb: "Ignite",
+			description: "Kindle light above the abyss. Mana flows twice as fast.",
+			cost: { energy: 25 },
+			recipe: [{ suite: "red" }, { suite: "red" }],
+			requires: [],
+			effect: { kind: "mana", value: 2 },
+		},
+		moon: {
+			name: "The Moon",
+			verb: "Consecrate",
+			description: "A light in the dark. Transmutation quickens by half.",
+			cost: { control: 40 },
+			recipe: [{ suite: "black" }, { suite: "black" }],
+			requires: [],
+			effect: { kind: "transmute", value: 1.5 },
+		},
+		land: {
+			name: "The Land",
+			verb: "Raise",
+			description: "Lift a continent from the deep. New cards are cheaper.",
+			cost: { control: 50 },
+			recipe: [{}, { rankRef: 0 }],
+			requires: [],
+			effect: { kind: "costGrowth", value: 0.8 },
+		},
+		sea: {
+			name: "The Sea",
+			verb: "Summon",
+			description:
+				"Call three waters of a kind home to the basin. Destroyed cards yield double essence.",
+			cost: { essence: 30 },
+			recipe: [{}, { suiteRef: 0 }, { suiteRef: 0 }],
+			requires: [],
+			effect: { kind: "essence", value: 2 },
+		},
+		life: {
+			name: "Life",
+			verb: "Breathe",
+			description:
+				"With sun, land and sea in place, breathe life into the world. All generation doubled.",
+			cost: { energy: 100, control: 100, essence: 100 },
+			recipe: [],
+			requires: ["sun", "land", "sea"],
+			effect: { kind: "all", value: 2 },
+		},
+	},
 	sparticle: {
 		abyss: {
 			count: 799,
@@ -116,6 +165,7 @@ export function defaultState() {
 		essence: 0,
 		cards: [],
 		upgrades: { manaFlow: 0, transmute: 0, handGrowth: 0 },
+		world: {},
 		stats: {
 			totalCardsDrawn: 0,
 			totalUpgrades: 0,
@@ -133,17 +183,64 @@ export function defaultState() {
 export const state = defaultState();
 window.state = state;
 
-const cardValue = (c) =>
-	c.getAttribute("rank") === "ace" ? 1 : Number(c.getAttribute("rank"));
+export const cardValue = (c) => {
+	const rank = typeof c === "string" ? c : c.getAttribute("rank");
+	return rank === "ace" ? 1 : Number(rank);
+};
 
-export const essenceFromCard = (c) => Math.max(1, Math.round(cardValue(c) / 2));
+export const SUITE_COLORS = {
+	hearts: "red",
+	diamonds: "red",
+	spades: "black",
+	clubs: "black",
+};
 
-export const manaPerSec = () => 0.85 * (1 + 0.25 * state.upgrades.manaFlow);
+export const worldMult = (kind) => {
+	let m = 1;
+	for (const [id, node] of Object.entries(Data.world)) {
+		if (!state.world[id] || !node.effect) continue;
+		if (node.effect.kind === kind || node.effect.kind === "all")
+			m *= node.effect.value;
+	}
+	return m;
+};
 
-export const transmutePerSec = () => 0.1 * (1 + 0.5 * state.upgrades.transmute);
+export const essenceFromCard = (c) =>
+	Math.max(1, Math.round((cardValue(c) / 2) * worldMult("essence")));
+
+export const manaPerSec = () =>
+	0.85 * (1 + 0.25 * state.upgrades.manaFlow) * worldMult("mana");
+
+export const transmutePerSec = () =>
+	0.1 * (1 + 0.5 * state.upgrades.transmute) * worldMult("transmute");
 
 export const cardCost = () =>
-	5 * 3 ** state.cards.length * 0.9 ** state.upgrades.handGrowth;
+	5 *
+	(3 * worldMult("costGrowth")) ** state.cards.length *
+	0.9 ** state.upgrades.handGrowth;
+
+// a card fills a ritual slot when its suite/rank pass the slot rules;
+// slots may point at earlier slots ({suiteRef}/{rankRef}) to demand
+// offerings of a kind, e.g. three cards of one suite
+export function matchesSlot(card, slot, placed = []) {
+	const suite = card.getAttribute("suite");
+	if (slot.suiteRef != null) {
+		if (
+			!placed[slot.suiteRef] ||
+			placed[slot.suiteRef].getAttribute("suite") !== suite
+		)
+			return false;
+	} else if (slot.suite === "red" || slot.suite === "black") {
+		if (SUITE_COLORS[suite] !== slot.suite) return false;
+	} else if (slot.suite && suite !== slot.suite) return false;
+
+	const value = cardValue(card);
+	if (slot.rankRef != null) {
+		if (!placed[slot.rankRef] || cardValue(placed[slot.rankRef]) !== value)
+			return false;
+	} else if (slot.rank != null && value !== slot.rank) return false;
+	return true;
+}
 
 export const upgradeCost = (id) => {
 	const def = Data.upgrades[id];

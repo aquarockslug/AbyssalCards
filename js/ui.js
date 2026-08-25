@@ -3,7 +3,9 @@ import Data, {
 	activeCard,
 	buyUpgrade,
 	cardCost,
+	cardValue,
 	essenceFromCard,
+	matchesSlot,
 	modifyCost,
 	state,
 	upgradeCost,
@@ -148,6 +150,12 @@ export function updateUI() {
 			`Lv ${state.upgrades[id]}`;
 		btn.disabled = state[def.resource] < c;
 	});
+
+	for (const [id, info] of worldNodes) {
+		info.craftBtn.disabled = !canCraft(id);
+		for (const btn of info.slotBtns)
+			btn.disabled = Boolean(rituals[id]?.[Number(btn.dataset.slot)]?.filled);
+	}
 }
 
 export function buildUpgradeUI() {
@@ -209,16 +217,20 @@ export function buyCard(rank, suite) {
 export function removeSelectedCard() {
 	const card = activeCard();
 	if (!card) return;
-	const idx = [...hand.querySelectorAll("game-card")].indexOf(card);
 	const gain = essenceFromCard(card);
 	state.essence += gain;
 	state.stats.totalEssence += gain;
 	state.stats.totalCardsDestroyed++;
-	card.remove();
+	removeCardFromState(card);
 	window.data.sfx.discard();
-	if (idx >= 0 && state.cards[idx]) state.cards.splice(idx, 1);
 	layoutHand();
 	updateUI();
+}
+
+function removeCardFromState(card) {
+	const idx = [...hand.querySelectorAll("game-card")].indexOf(card);
+	card.remove();
+	if (idx >= 0 && state.cards[idx]) state.cards.splice(idx, 1);
 }
 
 function syncCardState(card) {
@@ -251,16 +263,9 @@ export function shiftRank(delta) {
 
 const combineSlots = [null, null];
 
-export function placeInCombineSlot(i) {
-	const card = activeCard();
-	if (!card || combineSlots[i]) return;
-	if (!spendForModification()) return;
-
-	const btn = document.querySelectorAll(".combine-btn")[i];
-	const rank = card.getAttribute("rank");
-	const suite = card.getAttribute("suite");
-
-	// measure while the card is still in its selected pose
+// shrink + glide a selected card into a slot outline, leaving a static
+// mini face behind; the card is removed from hand and state on landing
+function flyCardToSlot(card, btn) {
 	const first = card.getBoundingClientRect();
 
 	// deselect manually; _deselect() resets the transform on the next
@@ -279,7 +284,6 @@ export function placeInCombineSlot(i) {
 	if (face) slotFace.appendChild(face);
 	btn.replaceChildren(slotFace);
 
-	// shrink + glide the card into the button's outline
 	const last = slotFace.getBoundingClientRect();
 	card.style.pointerEvents = "none";
 	card.style.zIndex = "100";
@@ -288,17 +292,25 @@ export function placeInCombineSlot(i) {
 		`translate(${first.left - last.left}px, ${first.top - last.top}px) ` +
 		`scale(${first.width / last.width})`;
 
-	combineSlots[i] = { rank, suite };
-	window.data.sfx.magic();
-
 	// card transition runs 0.4s; clean up once it has landed
 	setTimeout(() => {
-		const idx = [...hand.querySelectorAll("game-card")].indexOf(card);
-		card.remove();
-		if (idx >= 0 && state.cards[idx]) state.cards.splice(idx, 1);
+		removeCardFromState(card);
 		layoutHand();
 		updateUI();
 	}, 450);
+}
+
+export function placeInCombineSlot(i) {
+	const card = activeCard();
+	if (!card || combineSlots[i]) return;
+	if (!spendForModification()) return;
+
+	flyCardToSlot(card, document.querySelectorAll(".combine-btn")[i]);
+	combineSlots[i] = {
+		rank: card.getAttribute("rank"),
+		suite: card.getAttribute("suite"),
+	};
+	window.data.sfx.magic();
 
 	if (combineSlots[0] && combineSlots[1]) setTimeout(performCombine, 600);
 }
@@ -311,10 +323,158 @@ function performCombine() {
 	});
 
 	// ranks sum, capped at 10; result keeps the first card's suite
-	const value = (r) => (r === "ace" ? 1 : Number(r));
-	const total = Math.min(value(a.rank) + value(b.rank), 10);
+	const total = Math.min(cardValue(a.rank) + cardValue(b.rank), 10);
 	addCard(total === 1 ? "ace" : String(total), a.suite, hand);
 	window.data.sfx.draw();
+	updateUI();
+}
+
+// ---------- world rituals ----------
+
+const worldNodes = new Map();
+let activeNodeId = null;
+const rituals = {};
+
+function initRitual(id) {
+	rituals[id] ??= Data.world[id].recipe.map((spec) => ({
+		spec,
+		card: null,
+		filled: false,
+	}));
+	return rituals[id];
+}
+
+function canCraft(id) {
+	if (state.world[id]) return false;
+	const node = Data.world[id];
+	if (node.requires.some((p) => !state.world[p])) return false;
+	for (const [res, amount] of Object.entries(node.cost))
+		if ((state[res] ?? 0) < amount) return false;
+	const ritual = rituals[id];
+	if (node.recipe.length && !ritual?.every((e) => e.filled)) return false;
+	return true;
+}
+
+export function buildWorldUI() {
+	const pane = document.getElementById("world");
+	for (const [id, node] of Object.entries(Data.world)) {
+		const el = document.createElement("div");
+		el.className = "world-node";
+		el.dataset.id = id;
+		el.innerHTML =
+			`<div class="node-head">` +
+			`<span class="node-name">${node.name}</span>` +
+			`<span class="node-status"></span>` +
+			`</div>` +
+			`<div class="node-desc">${node.description}</div>` +
+			`<div class="node-cost"></div>` +
+			`<div class="node-reqs"></div>` +
+			`<div class="node-offering">` +
+			`<span class="btn-group-label">Offering</span>` +
+			`<div class="btn-group ritual-row">` +
+			node.recipe
+				.map(
+					(_, i) =>
+						`<button type="button" class="btn combine-btn ritual-slot" data-slot="${i}"></button>`,
+				)
+				.join("") +
+			`<button type="button" class="btn craft-btn">${node.verb}</button>` +
+			`</div></div>`;
+
+		el.querySelector(".node-head").addEventListener("click", () =>
+			toggleWorldNode(id),
+		);
+		el.querySelector(".craft-btn").addEventListener("click", () =>
+			performRitual(id),
+		);
+
+		const info = {
+			el,
+			statusEl: el.querySelector(".node-status"),
+			costEl: el.querySelector(".node-cost"),
+			reqEl: el.querySelector(".node-reqs"),
+			offeringEl: el.querySelector(".node-offering"),
+			craftBtn: el.querySelector(".craft-btn"),
+			slotBtns: [...el.querySelectorAll(".ritual-slot")],
+		};
+		worldNodes.set(id, info);
+		for (const [i, btn] of info.slotBtns.entries())
+			btn.addEventListener("click", () => placeInRitualSlot(id, i));
+
+		pane.appendChild(el);
+	}
+	refreshWorld();
+}
+
+export function toggleWorldNode(id) {
+	if (state.world[id]) return;
+	const node = Data.world[id];
+	if (node.requires.some((p) => !state.world[p])) return;
+	activeNodeId = activeNodeId === id ? null : id;
+	if (activeNodeId) initRitual(activeNodeId);
+	window.data.sfx.ui();
+	refreshWorld();
+	updateUI();
+}
+
+export function refreshWorld() {
+	for (const [id, info] of worldNodes) {
+		const node = Data.world[id];
+		const complete = Boolean(state.world[id]);
+		const unlocked = node.requires.every((p) => state.world[p]);
+		const discovered = unlocked || node.requires.some((p) => state.world[p]);
+		info.el.hidden = !discovered;
+		info.el.classList.toggle("completed", complete);
+		info.el.classList.toggle("locked", !unlocked && discovered);
+		info.el.classList.toggle("selected", activeNodeId === id);
+		info.statusEl.textContent = complete ? "\u2726 woven into being" : "";
+		info.reqEl.textContent =
+			unlocked || complete
+				? ""
+				: `Requires ${node.requires
+						.map((p) => Data.world[p].name)
+						.join(" + ")}`;
+		info.costEl.textContent = Object.entries(node.cost)
+			.map(
+				([res, amount]) =>
+					`${fmt(amount)} ${res[0].toUpperCase()}${res.slice(1)}`,
+			)
+			.join(" · ");
+		info.offeringEl.hidden =
+			!node.recipe.length || complete || activeNodeId !== id;
+		info.craftBtn.hidden = complete || activeNodeId !== id;
+	}
+}
+
+export function placeInRitualSlot(nodeId, slotIndex) {
+	if (state.world[nodeId]) return;
+	const ritual = initRitual(nodeId);
+	const entry = ritual[slotIndex];
+	if (!entry || entry.filled) return;
+	const card = activeCard();
+	if (!card) return;
+	const placed = ritual.filter((e) => e.filled).map((e) => e.card);
+	if (!matchesSlot(card, entry.spec, placed)) {
+		window.data.sfx.discard();
+		return;
+	}
+	entry.card = card;
+	entry.filled = true;
+	const btn = worldNodes.get(nodeId).slotBtns[slotIndex];
+	flyCardToSlot(card, btn);
+	window.data.sfx.magic();
+	updateUI();
+}
+
+export function performRitual(nodeId) {
+	if (state.world[nodeId] || !canCraft(nodeId)) return;
+	const node = Data.world[nodeId];
+	for (const [res, amount] of Object.entries(node.cost)) state[res] -= amount;
+	state.world[nodeId] = true;
+	delete rituals[nodeId];
+	if (activeNodeId === nodeId) activeNodeId = null;
+	window.data.sfx.magic();
+	refreshWorld();
 	updateUI();
 }
 

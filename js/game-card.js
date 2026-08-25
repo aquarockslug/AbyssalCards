@@ -1,6 +1,7 @@
 // a custom web component representing a card in the game
 // they have a rank and suite attribute
 
+import { cardValue } from "./game.js";
 import "./lib/hover-tilt.js";
 
 class Card extends HTMLElement {
@@ -143,7 +144,7 @@ class Card extends HTMLElement {
 		const suite = this.getAttribute("suite");
 		if (!this._face || !rank || !suite) return;
 
-		const value = rank === "ace" ? 1 : Number(rank);
+		const value = cardValue(this);
 		if (!Number.isFinite(value)) return;
 		const strength = Math.min(Math.max((value - 3) / 9, 0), 1);
 

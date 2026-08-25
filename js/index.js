@@ -10,7 +10,14 @@ import Data, {
 import Sparticles from "./lib/sparticles.js";
 import { load, startAutosave } from "./save.js";
 import "./game-card.js";
-import { addCard, buildUpgradeUI, hand, layoutHand, updateUI } from "./ui.js";
+import {
+	addCard,
+	buildUpgradeUI,
+	buildWorldUI,
+	hand,
+	layoutHand,
+	updateUI,
+} from "./ui.js";
 
 window.Data = Data;
 
@@ -59,6 +66,7 @@ window.onload = async () => {
 	new Sparticles(document.getRootNode().body, Data.sparticle.abyss);
 	await load();
 	buildUpgradeUI();
+	buildWorldUI();
 
 	for (const c of state.cards) addCard(c.rank, c.suite, hand, false);
 

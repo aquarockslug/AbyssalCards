@@ -1,4 +1,4 @@
-import { defaultState, manaPerSec, state } from "./game.js";
+import { defaultState, state } from "./game.js";
 
 const SAVE_KEY = "abyssalcards.save.v1";
 const OFFLINE_CAP = 2 * 60 * 60 * 1000;
@@ -30,6 +30,7 @@ export async function load() {
 		Object.assign(state, data);
 		Object.assign(state.upgrades, defaultState().upgrades, data.upgrades);
 		Object.assign(state.stats, defaultState().stats, data.stats);
+		Object.assign(state.world, defaultState().world, data.world ?? {});
 		if (!Array.isArray(state.cards)) state.cards = [];
 		delete state.board; // legacy saves stored cards on a board
 		delete state.achievements; // legacy saves tracked achievements

@@ -212,7 +212,7 @@ canvas.sparticles {
    Uses two IDs to out-rank the shared `#main-layout .window` height. */
 #main-layout #left-panel {
 	grid-column: 1;
-	grid-row: 1 / span 3;
+	grid-row: 1 / span 4;
 	height: auto;
 	align-self: stretch;
 	min-height: clamp(220px, 32vh, 340px);
@@ -221,6 +221,9 @@ canvas.sparticles {
 
 #gains-window {
 	animation: water-bob 8s ease-in-out -1s infinite;
+}
+#world-window {
+	animation: water-bob 7.7s ease-in-out -5s infinite;
 }
 #upgrades-window {
 	animation: water-bob 9s ease-in-out -4s infinite;
@@ -449,6 +452,102 @@ game-card + game-card {
 
 .upgrade-btn:disabled span {
 	opacity: 0.55;
+}
+
+/* ---- World Nodes ---- */
+.world-node {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 8px 10px;
+	background: rgba(2, 12, 22, 0.55);
+	border: 1px solid rgba(10, 240, 255, 0.18);
+	border-radius: 8px;
+	cursor: pointer;
+}
+
+.world-node[hidden] {
+	display: none;
+}
+
+.world-node.selected {
+	border-color: var(--secondary);
+	box-shadow: 0 0 14px rgba(10, 240, 255, 0.25);
+}
+
+.world-node.completed {
+	border-color: rgba(52, 211, 153, 0.5);
+	box-shadow: inset 0 0 18px rgba(52, 211, 153, 0.12);
+	cursor: default;
+}
+
+.world-node.locked {
+	opacity: 0.55;
+}
+
+.node-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 8px;
+}
+
+.node-name {
+	color: var(--secondary);
+	font-weight: bold;
+	font-size: 23px;
+}
+
+.world-node.completed .node-name {
+	color: #34d399;
+	text-shadow: 0 0 8px rgba(52, 211, 153, 0.4);
+}
+
+.node-status {
+	color: #34d399;
+	font-size: 19px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.node-desc {
+	color: var(--sys-color-grey);
+	font-size: 20px;
+	line-height: 1.25;
+}
+
+.node-cost {
+	font-family: Monaco, monospace;
+	font-size: 20px;
+	color: var(--sys-color-white);
+	opacity: 0.85;
+}
+
+.node-reqs {
+	color: #f87171;
+	font-size: 19px;
+}
+
+.node-reqs:empty,
+.node-status:empty {
+	display: none;
+}
+
+.node-offering[hidden] {
+	display: none;
+}
+
+.ritual-row {
+	align-items: center;
+}
+
+.combine-btn.ritual-slot {
+	cursor: pointer;
+}
+
+.craft-btn {
+	padding: 2px 12px;
+	white-space: nowrap;
 }
 
 /* Gentle bobbing, as if drifting on the water. */
