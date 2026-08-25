@@ -12,6 +12,9 @@ export const hand = document.getElementById("hand");
 const energyEl = document.getElementById("energy");
 const manaEl = document.getElementById("mana");
 const controlEl = document.getElementById("control");
+const energyDisplayEl = document.getElementById("energy-display");
+const manaDisplayEl = document.getElementById("mana-display");
+const controlDisplayEl = document.getElementById("control-display");
 const manaRateEl = document.getElementById("mana-rate");
 const energyRateEl = document.getElementById("energy-rate");
 const controlRateEl = document.getElementById("control-rate");
@@ -89,6 +92,9 @@ export function updateUI() {
 	energyRateEl.textContent = `${fmtRate(rates.energy)}/s`;
 	controlRateEl.textContent = `${fmtRate(rates.control)}/s`;
 	cardStatsEl.textContent = state.cards.length;
+
+	energyDisplayEl.style.display = rates.energy <= 0 ? "none" : "flex";
+	controlDisplayEl.style.display = rates.control <= 0 ? "none" : "flex";
 
 	const cost = cardCost();
 	const buyBtn = document.getElementById("buy-card");
