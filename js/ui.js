@@ -65,7 +65,11 @@ new MutationObserver(layoutHand).observe(hand, {
 	subtree: true,
 });
 
+// ui sfx
 addEventListener("card-select", () => window.data.sfx.ui());
+Array.from(document.querySelectorAll(".minimize")).map(
+	(b) => (b.onclick = data.sfx.ui),
+);
 
 export const fmt = (n) => {
 	if (!Number.isFinite(n)) return "∞";
@@ -473,7 +477,7 @@ export function performRitual(nodeId) {
 	state.world[nodeId] = true;
 	delete rituals[nodeId];
 	if (activeNodeId === nodeId) activeNodeId = null;
-	window.data.sfx.magic();
+	window.data.sfx.levelUp();
 	refreshWorld();
 	updateUI();
 }
