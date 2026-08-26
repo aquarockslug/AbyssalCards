@@ -70,7 +70,7 @@ const Data = {
 			name: "The Sea",
 			verb: "Summon",
 			description:
-				"Call three waters of a kind home to the basin. Destroyed cards yield double essence.",
+				"Destroyed cards yield double essence.",
 			cost: { essence: 30 },
 			recipe: [{}, { suiteRef: 0 }, { suiteRef: 0 }],
 			requires: [],
